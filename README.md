@@ -26,7 +26,7 @@ Save it in `.env` as `UPLOAD_URL`.
 
 ## How to use
 Run the file:
-```commandline
+```console
 $ python3 main.py
 ```
 
