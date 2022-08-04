@@ -49,7 +49,7 @@ def save_wall_photo(uploaded_photo_meta: dict) -> dict:
         'server': uploaded_photo_meta['server'],
         'hash': uploaded_photo_meta['hash'],
         'group_id': GROUP_ID,
-        'v': 5.131,
+        'v': API_VERSION,
     }
     response = requests.post(url, data=data)
     response.raise_for_status()
@@ -65,9 +65,9 @@ def post_comic(uploaded_photo: dict, alt: str) -> dict:
     url = 'https://api.vk.com/method/wall.post'
     data = {
         'access_token': access_token,
-        'v': 5.131,
+        'v': API_VERSION,
         'owner_id': -GROUP_ID,
-        'from_group': 1,
+        'from_group': True,
         'message': alt,
         'attachments': f"photo{uploaded_photo['owner_id']}_{uploaded_photo['id']}",
     }
@@ -85,7 +85,7 @@ def get_upload_server() -> dict:
     url = 'https://api.vk.com/method/photos.getWallUploadServer'
     params = {
         'access_token': access_token,
-        'v': 5.131,
+        'v': API_VERSION,
         'group_id': GROUP_ID,
     }
     response = requests.get(url, params=params)
