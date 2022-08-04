@@ -1,29 +1,23 @@
 import os
 from pathlib import Path
 from random import randint
-from typing import Optional
 
 import requests
 from dotenv import load_dotenv
 
-COMIC_DIR = Path('comics')
 GROUP_ID = 214611066
 API_VERSION = 5.131
 
 
-def save_remote_comic_and_alt(comic_number: int) -> Optional[dict]:
+def save_remote_comic_and_alt(comic_number: int) -> dict:
     url = f'https://xkcd.com/{comic_number}/info.0.json'
     response = requests.get(url)
     response.raise_for_status()
     comic_meta = response.json()
+
     img_url = comic_meta['img']
-
-    COMIC_DIR.mkdir(exist_ok=True)
     extension = Path(img_url).suffix
-    img_path = COMIC_DIR.joinpath(str(comic_number)).with_suffix(extension)
-
-    if img_path.exists():
-        return None
+    img_path = Path(str(comic_number)).with_suffix(extension)
 
     img_response = requests.get(img_url, stream=True)
     img_response.raise_for_status()
