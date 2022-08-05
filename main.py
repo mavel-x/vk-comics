@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 API_VERSION = 5.131
 
 
-def save_remote_comic_with_alt(comic_number: int) -> dict:
+def save_remote_comic_with_alt(comic_number: int) -> tuple:
     url = f'https://xkcd.com/{comic_number}/info.0.json'
     response = requests.get(url)
     response.raise_for_status()
@@ -23,10 +23,7 @@ def save_remote_comic_with_alt(comic_number: int) -> dict:
     with open(img_path, 'wb') as file:
         for chunk in img_response.iter_content(chunk_size=128):
             file.write(chunk)
-    return {
-        'file_path': img_path,
-        'alt': comic_meta['alt'],
-    }
+    return img_path, comic_meta['alt']
 
 
 def upload_comic(comic_path: str, access_token: str, upload_url: str, group_id: int) -> dict:
@@ -99,34 +96,34 @@ def get_upload_server(access_token: str, group_id: int) -> dict:
         raise requests.exceptions.RequestException('The request to VK returned an error.')
 
 
-def save_random_comic_with_alt() -> dict:
+def save_random_comic_with_alt() -> tuple:
     latest_comic_url = 'https://xkcd.com/info.0.json'
     response = requests.get(latest_comic_url)
     response.raise_for_status()
-    current_number = response.json()['num']
-    random_number = randint(1, current_number)
+    current_comic_number = response.json()['num']
+    random_number = randint(1, current_comic_number)
     return save_remote_comic_with_alt(random_number)
 
 
 def save_and_post_random_comic(access_token: str, upload_url: str, group_id: int) -> None:
-    comic = save_random_comic_with_alt()
+    comic_path, comic_alt = save_random_comic_with_alt()
+    uploaded_comic = upload_comic(
+        comic_path,
+        access_token=access_token,
+        upload_url=upload_url,
+        group_id=group_id,
+    )
     try:
-        uploaded_comic = upload_comic(
-            comic['file_path'],
-            access_token=access_token,
-            upload_url=upload_url,
-            group_id=group_id,
-        )
         post_response = post_comic(
             uploaded_comic,
-            alt=comic['alt'],
+            alt=comic_alt,
             access_token=access_token,
             group_id=group_id,
         )
+        if 'response' not in post_response:
+            raise requests.exceptions.RequestException('The request to VK returned an error.')
     finally:
-        os.remove(comic['file_path'])
-    if 'response' not in post_response:
-        raise requests.exceptions.RequestException('The request to VK returned an error.')
+        os.remove(comic_path)
 
 
 if __name__ == "__main__":
