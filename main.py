@@ -41,7 +41,7 @@ def upload_comic(comic_path: str, credentials: VKAuthorization) -> dict:
         }
         response = requests.post(credentials.upload_url, files=files)
         response.raise_for_status()
-        uploaded_photo = response.json()
+    uploaded_photo = response.json()
     return save_wall_photo(uploaded_photo, credentials)
 
 
@@ -99,10 +99,7 @@ def save_random_comic_with_alt() -> tuple:
 
 def save_and_post_random_comic(credentials: VKAuthorization) -> None:
     comic_path, comic_alt = save_random_comic_with_alt()
-    uploaded_comic = upload_comic(
-        comic_path,
-        credentials,
-    )
+    uploaded_comic = upload_comic(comic_path, credentials)
     try:
         post_response = post_comic(
             uploaded_comic,
