@@ -45,7 +45,7 @@ def upload_comic(comic_path: str, credentials: VKAuthorization) -> dict:
         
     # Checking for errors since all requests to vk return as 200:
     if 'error' in response.json():
-        raise requests.exceptions.RequestException(f'VK error: {response.json()["error"]["error_msg"]}')
+        raise RuntimeError(f'VK error: {response.json()["error"]["error_msg"]}')
 
     uploaded_photo = response.json()
     saved_wall_photo = save_wall_photo(uploaded_photo, credentials)
@@ -70,8 +70,8 @@ def save_wall_photo(uploaded_photo: dict, credentials: VKAuthorization) -> dict:
 
     # Checking for errors since all requests to vk return as 200:
     if 'error' in response.json():
-        raise requests.exceptions.RequestException(f'VK error: {response.json()["error"]["error_msg"]}')
-    
+        raise RuntimeError(f'VK error: {response.json()["error"]["error_msg"]}')
+
     return response.json()['response'][0]
 
 
@@ -90,11 +90,11 @@ def post_comic(uploaded_photo: dict, alt: str, credentials: VKAuthorization) -> 
 
     # Checking for errors since all requests to vk return as 200:
     if 'error' in response.json():
-        raise requests.exceptions.RequestException(f'VK error: {response.json()["error"]["error_msg"]}')
-    
+        raise RuntimeError(f'VK error: {response.json()["error"]["error_msg"]}')
+
     return response.json()
-    
-    
+
+
 def get_latest_comic_number():
     latest_comic_url = 'https://xkcd.com/info.0.json'
     response = requests.get(latest_comic_url)
@@ -110,8 +110,8 @@ def download_random_comic_with_alt() -> tuple:
 
 def save_and_post_random_comic(credentials: VKAuthorization) -> None:
     comic_path, comic_alt = download_random_comic_with_alt()
-    uploaded_comic = upload_comic(comic_path, credentials)
     try:
+        uploaded_comic = upload_comic(comic_path, credentials)
         post_comic(
             uploaded_comic,
             alt=comic_alt,
