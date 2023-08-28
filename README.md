@@ -29,8 +29,3 @@ Run the file:
 ```console
 $ python3 main.py
 ```
-
-## Project Goals
-
-The code was written for educational purposes 
-as part of an online course for developers at [dvmn.org](https://dvmn.org/).
